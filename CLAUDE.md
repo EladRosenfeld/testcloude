@@ -6,9 +6,10 @@
 
 **Repository**: testcloude
 **Owner**: EladRosenfeld
-**Status**: New project (initialized)
+**Project**: Wikipedia User Contribution Analyzer
+**Language**: Python 3.10+
 
-This is a newly created repository. As the project develops, this document should be updated to reflect the actual codebase structure, conventions, and workflows.
+A tool to fetch, analyze, and visualize Wikipedia user contributions. It retrieves edit history via the Wikipedia API, performs comprehensive analysis, and generates visualizations and reports.
 
 ---
 
@@ -16,30 +17,49 @@ This is a newly created repository. As the project develops, this document shoul
 
 ```
 testcloude/
+├── main.py             # CLI entry point and orchestration
+├── wiki_api.py         # Wikipedia API client
+├── analyzer.py         # Data analysis and statistics
+├── visualizer.py       # Chart and graph generation
+├── config.py           # Configuration settings
+├── requirements.txt    # Python dependencies
+├── README.md           # User documentation
 ├── CLAUDE.md           # AI assistant guidelines (this file)
-└── .git/               # Git version control
+├── .gitignore          # Git ignore patterns
+└── output/             # Generated reports and charts (gitignored)
 ```
 
-*As the project grows, update this section with the actual directory structure.*
+---
 
-### Planned Structure Template
+## Module Overview
 
-```
-testcloude/
-├── src/                # Source code
-│   ├── components/     # UI components (if applicable)
-│   ├── lib/            # Library/utility code
-│   ├── services/       # Service layer
-│   └── index.*         # Entry point
-├── tests/              # Test files
-├── docs/               # Documentation
-├── scripts/            # Build/utility scripts
-├── .github/            # GitHub workflows and templates
-├── package.json        # Project dependencies (Node.js)
-├── tsconfig.json       # TypeScript configuration (if used)
-├── README.md           # Project documentation
-└── CLAUDE.md           # AI assistant guidelines
-```
+### main.py
+- Entry point with CLI argument parsing
+- Orchestrates API calls, analysis, and visualization
+- Generates text reports and JSON exports
+- Key functions: `main()`, `print_summary()`, `generate_report()`, `export_json()`
+
+### wiki_api.py
+- `WikipediaAPI` class for API interactions
+- Handles pagination, rate limiting, retries
+- Key methods: `fetch_contributions()`, `check_user_exists()`, `get_user_info()`
+
+### analyzer.py
+- `ContributionAnalyzer` class for data processing
+- `ContributionStats` dataclass for results
+- Temporal analysis, topic categorization, edit size stats
+- Uses pandas for data manipulation
+
+### visualizer.py
+- `ContributionVisualizer` class for matplotlib charts
+- Generates 8 different chart types
+- Supports saving to files and interactive display
+
+### config.py
+- API endpoints and request parameters
+- Rate limiting settings
+- Visualization configuration
+- Topic categorization keywords
 
 ---
 
@@ -47,7 +67,7 @@ testcloude/
 
 ### Git Workflow
 
-1. **Branch Naming**: Use descriptive branch names
+1. **Branch Naming**:
    - Features: `feature/<description>`
    - Fixes: `fix/<description>`
    - Claude sessions: `claude/<session-id>`
@@ -55,52 +75,44 @@ testcloude/
 2. **Commit Messages**: Follow conventional commits
    ```
    type(scope): description
-
-   [optional body]
    ```
    Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
-3. **Pull Requests**: Include clear descriptions and link related issues
-
 ### Code Style
 
-- Write clean, readable, and maintainable code
-- Follow the project's established patterns and conventions
-- Add comments only when the logic isn't self-evident
+- Follow PEP 8 guidelines
+- Use type hints for function signatures
+- Write docstrings for public functions and classes
+- Keep functions focused and single-purpose
 - Prefer descriptive names over comments
 
 ### Testing
 
-- Write tests for new functionality
-- Ensure all tests pass before committing
-- Follow the existing test patterns in the codebase
+- Test new API interactions with mock responses
+- Verify analysis logic with known data sets
+- Ensure visualizations render without errors
 
 ---
 
 ## Commands Reference
 
-*Update this section with actual project commands once established.*
-
-### Common Commands (Template)
-
 ```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+
 # Install dependencies
-npm install
+pip install -r requirements.txt
 
-# Run development server
-npm run dev
+# Run analyzer
+python main.py <username>
 
-# Build for production
-npm run build
+# Run with options
+python main.py <username> --output ./reports --show-charts
 
-# Run tests
-npm test
-
-# Lint code
-npm run lint
-
-# Format code
-npm run format
+# Quick test (quiet mode, no charts)
+python main.py <username> -q --no-charts
 ```
 
 ---
@@ -110,77 +122,90 @@ npm run format
 ### When Working on This Repository
 
 1. **Read Before Editing**: Always read files before modifying them
-2. **Understand Context**: Explore related code to understand patterns
-3. **Follow Conventions**: Match existing code style and patterns
-4. **Minimal Changes**: Make only necessary changes, avoid over-engineering
-5. **Test Your Changes**: Run tests and verify functionality
-6. **Clear Commits**: Write descriptive commit messages
+2. **Understand the Pipeline**: API → Analysis → Visualization → Export
+3. **Follow Conventions**: Match existing code patterns
+4. **Minimal Changes**: Only change what's necessary
+5. **Test Changes**: Run the tool with a real username to verify
+
+### Key Patterns to Follow
+
+- Use dataclasses for structured data (`ContributionStats`)
+- Use type hints consistently
+- Handle API errors with custom exceptions (`WikipediaAPIError`)
+- Respect rate limiting when making API calls
+- Use pandas for data manipulation in analyzer.py
 
 ### Do's
 
-- Use existing patterns found in the codebase
-- Keep changes focused and minimal
-- Update documentation when adding new features
-- Handle errors appropriately at system boundaries
-- Use the TodoWrite tool for complex multi-step tasks
+- Add proper error handling for API failures
+- Use existing config values from `config.py`
+- Keep visualization functions modular
+- Update docstrings when modifying functions
 
 ### Don'ts
 
-- Don't add features beyond what was requested
-- Don't refactor unrelated code
-- Don't add unnecessary comments or documentation
-- Don't create abstractions for one-time operations
-- Don't introduce security vulnerabilities (SQL injection, XSS, etc.)
-
-### Security Considerations
-
-- Never commit secrets, API keys, or credentials
-- Validate user input at system boundaries
-- Follow OWASP security guidelines
-- Use parameterized queries for database operations
+- Don't hardcode API endpoints (use config.py)
+- Don't remove rate limiting delays
+- Don't add blocking operations without timeouts
+- Don't commit API keys or credentials
 
 ---
 
 ## Configuration Files
 
-*Document key configuration files as they are added to the project.*
-
 | File | Purpose |
 |------|---------|
-| `package.json` | Node.js dependencies and scripts |
-| `tsconfig.json` | TypeScript compiler options |
-| `.eslintrc.*` | ESLint linting rules |
-| `.prettierrc` | Code formatting rules |
-| `.env.example` | Environment variables template |
-| `.gitignore` | Git ignore patterns |
+| `config.py` | API settings, visualization config, topic keywords |
+| `requirements.txt` | Python package dependencies |
+| `.gitignore` | Excludes output files, venv, cache |
 
 ---
 
 ## Architecture Notes
 
-*Add architectural decisions and patterns as the project develops.*
+### Data Flow
 
-### Key Patterns
-
-- Document design patterns used in the codebase
-- Note any architectural decisions and their rationale
-- List external services and integrations
+```
+Wikipedia API → raw JSON contributions
+     ↓
+ContributionAnalyzer → pandas DataFrame → ContributionStats
+     ↓
+ContributionVisualizer → matplotlib figures → PNG files
+     ↓
+main.py → text report / JSON export
+```
 
 ### Dependencies
 
-- Document major dependencies and their purposes
-- Note any version constraints or compatibility requirements
+| Package | Purpose |
+|---------|---------|
+| `requests` | HTTP client for Wikipedia API |
+| `pandas` | Data analysis and manipulation |
+| `matplotlib` | Chart and graph generation |
+| `python-dateutil` | Timestamp parsing |
+| `tqdm` | Progress bar display |
 
 ---
 
 ## Troubleshooting
 
-*Add common issues and solutions as they are discovered.*
-
 ### Common Issues
 
-1. **Issue**: [Description]
-   - **Solution**: [Steps to resolve]
+1. **API rate limiting errors**
+   - Increase `REQUEST_DELAY` in config.py
+   - Add exponential backoff for retries
+
+2. **User not found**
+   - Check username spelling and case sensitivity
+   - Verify language code matches user's Wikipedia
+
+3. **No contributions fetched**
+   - User may have 0 edits
+   - API pagination might have failed
+
+4. **Matplotlib display issues**
+   - Use `--no-charts` flag to skip visualization
+   - Check matplotlib backend configuration
 
 ---
 
@@ -189,18 +214,7 @@ npm run format
 | Date | Changes |
 |------|---------|
 | 2026-01-29 | Initial CLAUDE.md created |
-
----
-
-## Contributing
-
-When contributing to this repository:
-
-1. Create a feature branch from the main branch
-2. Make your changes following the guidelines above
-3. Write or update tests as needed
-4. Ensure all tests pass
-5. Submit a pull request with a clear description
+| 2026-01-29 | Added Wikipedia User Contribution Analyzer project |
 
 ---
 
